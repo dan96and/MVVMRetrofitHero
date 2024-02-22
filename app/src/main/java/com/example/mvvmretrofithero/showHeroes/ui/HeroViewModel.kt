@@ -48,13 +48,14 @@ class HeroViewModel @Inject constructor(private val heroUseCase: HeroUseCase) : 
         if (response.response == "error") {
             _enableNoResultsFound.value = true
         } else {
-            response.results.sortedWith(compareBy<SuperHero> {
+            val sortedResults = response.results.sortedWith(compareBy<SuperHero> {
                 !it.name.startsWith(nameHero, ignoreCase = true)
             }.thenBy {
                 it.name
             })
 
-//            _heroList.postValue(response2)
+            val newResponse = HeroResponse(response.response, sortedResults)
+            _heroList.postValue(newResponse)
         }
     }
 }

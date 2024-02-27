@@ -5,7 +5,6 @@ import com.example.mvvmretrofithero.showHeroes.data.network.response.HeroRespons
 import javax.inject.Inject
 
 class HeroRepository @Inject constructor(private val api: HeroService) {
-
     suspend fun getListHeroByName(nameHero: String): HeroResponse {
         return api.getListSuperHero(nameHero)
     }

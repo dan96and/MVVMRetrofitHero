@@ -2,13 +2,18 @@ package com.example.mvvmretrofithero.showHeroDetails.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +27,12 @@ import com.example.mvvmretrofithero.showHeroDetails.data.network.response.HeroDe
 @Composable
 fun HeroDetailScreen(heroDetailViewModel: HeroDetailViewModel, idHero: Int) {
 
-    heroDetailViewModel.getDetailHeroById(idHero)
+    LaunchedEffect(key1 = true) {
+        heroDetailViewModel.getDetailHeroById(idHero)
+    }
 
-    val responseHero: HeroDetailResponse? = heroDetailViewModel.heroDetail.value
+    val responseHero: HeroDetailResponse? by heroDetailViewModel.heroDetail.observeAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,13 +40,37 @@ fun HeroDetailScreen(heroDetailViewModel: HeroDetailViewModel, idHero: Int) {
     ) {
         NameHero(nameHero = responseHero?.name ?: "-")
         Row {
-            PowerStats(responseHero, modifier = Modifier.weight(2f))
+            PowerStats(responseHero, modifier = Modifier.weight(2f), heroDetailViewModel)
             ImageHero(
                 modifier = Modifier.weight(1f),
                 imageUrl = responseHero?.image?.url
                     ?: "https://ih1.redbubble.net/image.1893341687.8294/fposter,small,wall_texture,product,750x1000.jpg"
             )
         }
+        Column {
+            Title("Introducción")
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "El personaje de ${responseHero?.name ?: "-"} su ocupación es ser ${responseHero?.work?.occupation ?: "-"} en ${responseHero?.work?.base ?: "-"}."
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Tiene una estatura de ${responseHero?.appearance?.height?.get(1) ?: "-"} y un peso de ${
+                    responseHero?.appearance?.weight?.get(1) ?: "-"
+                }."
+            )
+
+        }
+        Spacer(modifier = Modifier.fillMaxWidth().size(16.dp))
+        Column {
+            Title("Primera aparición")
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "La primera aparición del personaje fue en comic ${responseHero?.biography?.firstAppearance ?: "-"} publicado por ${responseHero?.biography?.publisher ?: "-"}."
+            )
+        }
+        Spacer(modifier = Modifier.fillMaxWidth().size(16.dp))
+        
     }
 }
 
@@ -63,58 +95,47 @@ fun ImageHero(imageUrl: String, modifier: Modifier) {
 }
 
 @Composable
-fun PowerStats(responseHero: HeroDetailResponse?, modifier: Modifier) {
+fun PowerStats(
+    responseHero: HeroDetailResponse?,
+    modifier: Modifier,
+    heroDetailViewModel: HeroDetailViewModel
+) {
     Column(
         modifier = modifier
     ) {
-        Title()
+        Title(text = "Power stats")
         Stats(
             nameStats = "Intelligence",
-            powerStat = checkValue(responseHero?.powerstats?.intelligence.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.intelligence.toString())
         )
         Stats(
             nameStats = "Strength",
-            powerStat = checkValue(responseHero?.powerstats?.strength.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.strength.toString())
         )
         Stats(
             nameStats = "Speed",
-            powerStat = checkValue(responseHero?.powerstats?.speed.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.speed.toString())
         )
         Stats(
             nameStats = "Durability",
-            powerStat = checkValue(responseHero?.powerstats?.durability.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.durability.toString())
         )
         Stats(
             nameStats = "Power",
-            powerStat = checkValue(responseHero?.powerstats?.power.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.power.toString())
         )
         Stats(
             nameStats = "Combat",
-            powerStat = checkValue(responseHero?.powerstats?.combat.toString())
+            powerStat = heroDetailViewModel.checkValue(responseHero?.powerstats?.combat.toString())
         )
-    }
-}
-
-private fun checkValue(value: String): Float {
-    return if (value != "null") {
-        // Si intelligenceString no es nulo y no tiene el valor "null", intenta convertirlo a Float
-        try {
-            value.toFloat()
-        } catch (e: NumberFormatException) {
-            // Si la conversión falla, maneja el error aquí
-            0f // O un valor predeterminado adecuado
-        }
-    } else {
-        // Si intelligenceString es nulo o tiene el valor "null", asigna un valor predeterminado
-        0f // O un valor predeterminado adecuado
     }
 }
 
 @Composable
-fun Title() {
+fun Title(text: String) {
     Text(
         modifier = Modifier
-            .padding(vertical = 4.dp), text = "Power stats",
+            .padding(vertical = 4.dp), text = text,
         fontWeight = FontWeight.Bold,
         textDecoration = TextDecoration.Underline,
         fontSize = 16.sp
@@ -131,7 +152,6 @@ fun Stats(nameStats: String, powerStat: Float) {
                 .align(Alignment.CenterVertically),
         )
         LinearProgressIndicator(
-
             progress = powerStat / 100,
             modifier = Modifier
                 .weight(2f)

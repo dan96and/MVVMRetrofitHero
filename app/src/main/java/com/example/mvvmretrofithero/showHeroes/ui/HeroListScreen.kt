@@ -35,21 +35,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.paging.Pager
 import coil.compose.AsyncImage
 import com.example.mvvmretrofithero.showHeroes.data.network.response.HeroResponse
 
 @Composable
-fun HeroScreen(heroViewModel: HeroViewModel, navController: NavHostController) {
+fun HeroListScreen(heroViewModel: HeroViewModel, navController: NavHostController) {
 
     val enableSpinner: Boolean by heroViewModel.enableSpinner.observeAsState(initial = false)
     val enableNoResultsFound: Boolean by heroViewModel.enableNoresultsFound.observeAsState(initial = false)
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
+        modifier = Modifier.fillMaxSize().padding(8.dp)) {
         SearchField(heroViewModel)
         if (enableNoResultsFound) {
             NoResultsFound()
@@ -175,5 +171,4 @@ fun NoResultsFound() {
             fontWeight = FontWeight.Bold
         )
     }
-
 }

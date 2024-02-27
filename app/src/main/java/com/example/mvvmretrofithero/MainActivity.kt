@@ -15,7 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mvvmretrofithero.showHeroDetails.ui.HeroDetailScreen
 import com.example.mvvmretrofithero.showHeroDetails.ui.HeroDetailViewModel
-import com.example.mvvmretrofithero.showHeroes.ui.HeroScreen
+import com.example.mvvmretrofithero.showHeroes.ui.HeroListScreen
 import com.example.mvvmretrofithero.showHeroes.ui.HeroViewModel
 import com.example.mvvmretrofithero.ui.theme.MVVMRetrofitHeroTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "listHeroScreen") {
-                        composable("listHeroScreen") { HeroScreen(heroViewModel, navController) }
+                        composable("listHeroScreen") { HeroListScreen(heroViewModel, navController) }
                         composable(
                             "detailHeroScreen/{idHero}",
                             arguments = listOf(navArgument("idHero") { type = NavType.IntType })
